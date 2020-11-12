@@ -54,6 +54,7 @@ app.get('/', (req, res) => {
 })
 
 app.use(express.static(path.join(__dirname, '../../dist/')))
+app.use(express.static(path.join(__dirname, '../../assets/')))
 
 const httpsServer = https.createServer({cert: certificate, key: privateKey}, app);
 const server = httpsServer.listen(3000);
