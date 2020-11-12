@@ -36,44 +36,73 @@ function escapeHTML(text) {
   });
 }
 
-function generateQR(recv_settings) {
+function generateQR() {
+  const recv_settings = {
+    url : location.href,
+    uuid : uuidv4(),
+    key : CryptoJS.lib.WordArray.random(128 / 8).toString(),
+    iv: CryptoJS.lib.WordArray.random(128 / 8).toString()
+  };
+
   log("Recv settings", {recv_settings});
   QRCode.toCanvas(canvas, JSON.stringify(recv_settings));
+  return recv_settings;
 }
 
-function scanQR(engine, callback) {
-  var count = 0;
-  // Scan for QR codes
-  (function _scanQR() {
-      QRScanner.scanImage(video, null, engine).then(result => {
-        log("scanQR", {result});
-        // Stop and kill the video stream
-        video.srcObject.getTracks().forEach(function(track) { track.stop(); });
-        video.remove();
+function scanQR(callback) {
+  if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'environment'
+      }
+    }).then((stream) => {
+      video.srcObject = stream;
 
-        callback(JSON.parse(result));
-      }).catch((err) => {
-        if (err == 'No QR code found') {
-          count += 1;
-          if (count < sps * 10) {
-            setTimeout(_scanQR, 1000 / sps);
-          }
-          else {
-            // Stop and kill the video stream
-            video.srcObject.getTracks().forEach(function(track) { track.stop(); });
-            video.remove();
-          }
-        } else {
-          log(`Fatal error: ${err}`);
-        }
+      video.addEventListener('play', function() {
+        QRScanner.createQrEngine(QRScanner.WORKER_PATH).then(engine => {
+          var count = 0;
+          
+          (function _scanQR() {
+              QRScanner.scanImage(video, null, engine).then(result => {
+                log("scanQR", {result});
+                // Stop and kill the video stream
+                video.srcObject.getTracks().forEach(function(track) { track.stop(); });
+                video.remove();
+
+                callback(JSON.parse(result));
+              }).catch((err) => {
+                if (err == 'No QR code found') {
+                  count += 1;
+                  if (count < sps * 10) {
+                    setTimeout(_scanQR, 1000 / sps);
+                  }
+                  else {
+                    // Stop and kill the video stream
+                    video.srcObject.getTracks().forEach(function(track) { track.stop(); });
+                    video.remove();
+                  }
+                } else {
+                  log(`Fatal error: ${err}`);
+                }
+              });
+          })();
+        });
       });
-  })();
+    });
+  }
 }
 
-function wsSend(data) {
-  var sendSocket = new WebSocket(`wss://${location.host}/send/${data.uuid}`);
+function wsSend(send_settings, payload) {
+  var sendSocket = new WebSocket(`wss://${location.host}/send/${send_settings.uuid}`);
   sendSocket.onopen = () => {
+    let data = {
+      uuid : send_settings.uuid, 
+      url : send_settings.url, 
+      // Encrypt payload
+      payload: AES.encrypt(JSON.stringify(payload), send_settings.key, { iv: send_settings.iv }).toString()
+    };
     log("wsSend", {data});
+
     sendSocket.send(JSON.stringify(data));
   };
 }
@@ -91,18 +120,11 @@ function wsRecv(recv_settings, callback) {
 }
 
 function recvMessage() {
-  const recv_settings = {
-    url : location.href,
-    uuid : uuidv4(),
-    key : CryptoJS.lib.WordArray.random(128 / 8).toString(),
-    iv: CryptoJS.lib.WordArray.random(128 / 8).toString()
-  };
+  const recv_settings = generateQR();
 
   canvas.style.display = 'block';
   video.style.display = 'none';
 
-  generateQR(recv_settings);
-  
   wsRecv(recv_settings, (data) => {
     video.style.display = 'none';
     canvas.style.display = 'none';
@@ -116,34 +138,15 @@ function sendMessage(payload) {
   canvas.style.display = 'none';
   video.style.display = 'block';
 
-  // Camera stuff
-  if ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) {
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'environment'
-      }
-    }).then((stream) => {
-      video.srcObject = stream;
-      video.addEventListener('play', function() {
-        QRScanner.createQrEngine(QRScanner.WORKER_PATH).then(engine => {
-          scanQR(engine, (result) => {
-            video.style.display = 'none';
-            canvas.style.display = 'none';
+  scanQR((send_settings) => {
+    video.style.display = 'none';
+    canvas.style.display = 'none';
 
-            let msg = escapeHTML(payload.msg);
-            document.getElementById('payload').innerHTML = `<h2>Sent payload:</h2><pre>${msg}</pre>`;
+    let msg = escapeHTML(payload.msg);
+    document.getElementById('payload').innerHTML = `<h2>Sent payload:</h2><pre>${msg}</pre>`;
 
-            wsSend({
-              uuid : result.uuid, 
-              url : result.url, 
-              // Encrypt payload
-              payload: AES.encrypt(JSON.stringify(payload), result.key, { iv: result.iv }).toString()
-            });
-          });
-        });
-      });
-    });
-  }
+    wsSend(send_settings, payload);
+  });
 }
 
 document.getElementById('sendClipboard').onclick = () => {
