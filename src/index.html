@@ -4,23 +4,27 @@
     <meta charset="utf-8"/>
   </head>
   <body>
-    <h1>SendPass</h1>
+    <h1><img class="logo" src="logo.png" />SendPass</h1>
     <div class="recvData">
       <canvas id="canvas"></canvas>
       <video autoplay></video>
       <div id="payload"></div>
     </div>
 
-    <div class="sendData">
-      <textarea id="msg" placeholder="Text to send here..."></textarea>
-      <div class="buttonGroup">
-        <button id="sendClipboard">Send Clipboard</button>
-        <button id="sendText">Send Text</button>
+    <div id="sendData" class="sendData">
+      <div>
+        <input type="password" id="msg" placeholder="Text to send here..." autocomplete="off" />
+        <div class="buttonGroup">
+          <button id="sendClipboard">Send Clipboard</button>
+          <button id="sendText">Send Text</button>
+        </div>
       </div>
     </div>
     
 
-    <h3>Debug log:</h3>
-    <div id="log"></div>
+    <div class="log">
+      <h3>Debug log:</h3>
+      <div id="log"></div>
+    </div>
   </body>
 </html>

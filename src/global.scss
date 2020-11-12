@@ -1,5 +1,73 @@
-$body-color: red;
+$primary-0: rgba(  3, 39, 66,1);
+$primary-1: rgba(  4, 25, 42,1);
+$primary-2: rgba(  2, 30, 51,1);
+$primary-3: rgba(  5, 59,100,1);
+$primary-4: rgba(  6, 79,136,1);
+$primary-6: rgb(138, 204, 255);
+
+$body-color: $primary-6;
+$body-background-color: $primary-4;
 
 body {
   color: $body-color;
+  background-color: $body-background-color;
+}
+
+.logo {
+  height: 0.8em;
+}
+
+.recvData {
+  padding: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recvData > div, .recvData > canvas, .recvData > video {
+  border: 2px solid $primary-0;
+  border-radius: 8px;
+  min-height: 480px;
+}
+
+.recvData > div {
+  width: 640px;
+  padding: 5px;
+}
+
+.recvData > video {
+  width: 640px;
+}
+
+.sendData {
+  padding: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.sendData > div {
+  width: 640px;
+  border: 2px solid $primary-0;
+  border-radius: 8px;
+}
+
+#msg {
+  margin: 5px;
+  width: 100%;
+}
+
+.buttonGroup {
+  margin-top: 5px;
+}
+
+#payload {
+  display: none;
+}
+
+.log {
+  display: none;
 }
