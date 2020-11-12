@@ -45,7 +45,7 @@ function generateQR() {
   };
 
   log("Recv settings", {recv_settings});
-  QRCode.toCanvas(canvas, JSON.stringify(recv_settings));
+  QRCode.toCanvas(canvas, JSON.stringify(recv_settings), {margin: 2, width: 480});
   return recv_settings;
 }
 
@@ -65,11 +65,12 @@ function scanQR(callback) {
           (function _scanQR() {
               QRScanner.scanImage(video, null, engine).then(result => {
                 log("scanQR", {result});
+
+                callback(JSON.parse(result));
+
                 // Stop and kill the video stream
                 video.srcObject.getTracks().forEach(function(track) { track.stop(); });
                 video.remove();
-
-                callback(JSON.parse(result));
               }).catch((err) => {
                 if (err == 'No QR code found') {
                   count += 1;
@@ -128,28 +129,47 @@ function recvMessage() {
   wsRecv(recv_settings, (data) => {
     video.style.display = 'none';
     canvas.style.display = 'none';
+    document.getElementById('sendData').style.display = 'none';
 
     let msg = escapeHTML(data.payload.msg);
-    document.getElementById('payload').innerHTML = `<h2>Received payload:</h2><pre>${msg}</pre>`;
+    let outputElem = document.getElementById('payload');
+    outputElem.style.display = 'block';
+    outputElem.innerHTML = `<h2>Received payload:</h2><pre>${msg}</pre>`;
   });
 }
 
 function sendMessage(payload) {
   canvas.style.display = 'none';
   video.style.display = 'block';
+  canvas.style.width = `640px`;
+  canvas.style.height = `480px`;
 
   scanQR((send_settings) => {
+    
+    let context = canvas.getContext('2d');
+    log(video.videoWidth, video.videoHeight);
+    canvas.style.width = `${video.videoWidth}px`;
+    canvas.style.height = `${video.videoHeight}px`;
+        
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.style.display = 'block';
     video.style.display = 'none';
-    canvas.style.display = 'none';
-
-    let msg = escapeHTML(payload.msg);
-    document.getElementById('payload').innerHTML = `<h2>Sent payload:</h2><pre>${msg}</pre>`;
+        
+    setTimeout(() => {
+      let outputElem = document.getElementById('payload');
+      outputElem.style.display = 'block';
+      canvas.style.display = 'none';
+      let msg = escapeHTML(payload.msg);
+      outputElem.innerHTML = `<h2>Sent payload:</h2><pre>${msg}</pre>`;
+    }, 1000);
 
     wsSend(send_settings, payload);
   });
 }
 
 document.getElementById('sendClipboard').onclick = () => {
+  document.getElementById('sendClipboard').disabled = true;
+  document.getElementById('sendText').disabled = true;
   navigator.clipboard.readText().then(text => {
     sendMessage({
       msg : text
@@ -158,9 +178,12 @@ document.getElementById('sendClipboard').onclick = () => {
 }
 
 document.getElementById('sendText').onclick = () => {
+  document.getElementById('sendClipboard').disabled = true;
+  document.getElementById('sendText').disabled = true;
   sendMessage({
-    msg : document.querySelector('textarea').value || 'Hello World!'
+    msg : document.getElementById('msg').value || 'Hello World!'
   });
+  document.getElementById('msg').value = '';
 }
 
 recvMessage();
