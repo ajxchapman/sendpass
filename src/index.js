@@ -44,8 +44,23 @@ function generateQR() {
     iv: CryptoJS.lib.WordArray.random(128 / 8).toString()
   };
 
-  log("Recv settings", {recv_settings});
-  QRCode.toCanvas(canvas, JSON.stringify(recv_settings), {margin: 2, width: 480});
+  log('Recv settings', {recv_settings});
+
+  let image = new Image();
+  image.src = '/assets/qr_logo.png';
+  image.onload = function() {
+    QRCode.toCanvas(canvas, JSON.stringify(recv_settings), {margin: 2, width: 480}, () => {
+      let context = canvas.getContext('2d');
+      
+      context.drawImage(image, 
+        (canvas.width / 2 - image.width / 2), 
+        (canvas.height / 2 - image.height / 2), 
+        image.width,
+        image.height
+      );
+    });
+  };
+  
   return recv_settings;
 }
 
