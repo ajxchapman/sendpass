@@ -8,7 +8,7 @@ Securely* send passwords, URLs or other text data from any trusted computer with
 
 ### How do I use SendPass?
 
-SendPass required two computers to access the SendPass server, a sending system and a receiving system. On the sending system enter the data you want to send in the provided input boxes and hit `Send`. In the subsequently displayed camera view locate the QR Code displayed by the receiving system. Once the QR code is successfully read the data will be transfered.
+SendPass requires two computers, a sending system and a receiving system. On the receiving system open up [https://sendpass.io](https://sendpass.io). Then on the sending system open up [https://sendpass.io](https://sendpass.io) and enter the data you want to send in the provided input boxes and hit `Send`. In the subsequently displayed camera view locate the QR Code displayed by the receiving system. Once the QR code is successfully read the data will be transfered.
 
 ### Can the SendPass server see passwords I send with SendPass?
 

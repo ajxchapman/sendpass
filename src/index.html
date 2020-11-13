@@ -71,5 +71,23 @@
       <a href="https://twitter.com/intent/follow?screen_name=sendpassio"><img src="/assets/twitter_follow.png" alt="Follow @SendPassIO on Tiwtter"></a>
       <a href="https://twitter.com/intent/tweet?text=I just sent a password securely with @SendPassIO%0ahttps://sendpass.io"><img src="/assets/twitter_tweet.png" alt="Tweet @SendPassIO support"></a>
     </div>
+
+    <div>
+      <h2>FAQ</h1>
+      <h3>How do I use SendPass?</h3>
+      <p>SendPass requires two computers, a sending system and a receiving system. On the receiving system open up <a href="https://sendpass.io">https://sendpass.io</a>. Then on the sending system open up <a href="https://sendpass.io">https://sendpass.io</a> and enter the data you want to send in the provided input boxes and hit `Send`. In the subsequently displayed camera view locate the QR Code displayed by the receiving system. Once the QR code is successfully read the data will be transfered.</p>
+      <h3>Can the SendPass server see passwords I send with SendPass?</h3>
+      <p>No, any data sent through SendPass is encrypted in your browser before being sent via the SnedPass server. The sever would only be able to see the encrypted data.</p>
+      <h3>Can I host my own SendPass server?</h3>
+      <p>Absolutely! Fork this repository and build and run SendPass using Docker.</p>
+      <h3>What Web permissions does SendPass require, and what does it dow with them?</h3>
+      <p>
+        SendPass will request access to the following Web permissions:
+        <ul>
+          <li>`Camera` (required) - SendPass needs to be able to access the camera of the system sending data. The camera is used to capture the QR Code displayed by the receiving system. No captured images are sent to or stored by SendPass. Audio is not recorded.</li>
+          <li>`Clipboard` (<i>optional</i>) - SendPass may optionally requres access to the clipboard on the sending or receiving system in order to streamline the data transfer process. This permission is not required and may be denied if you'd prefer.</li>
+        </ul>
+      </p>
+    </div>
   </body>
 </html>
