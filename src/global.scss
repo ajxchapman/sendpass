@@ -71,3 +71,11 @@ body {
 .log {
   display: none;
 }
+// Social Images
+.social {
+  text-align: center;
+
+  > a:not(:first-child) {
+    margin-left: 5px;
+  }
+}
