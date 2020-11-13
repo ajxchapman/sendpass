@@ -14,7 +14,9 @@ body {
 }
 
 .logo {
-  height: 0.8em;
+  height: 2em;
+  vertical-align: middle;
+  display: inline-block;
 }
 
 .recvData {
@@ -55,13 +57,18 @@ body {
   border-radius: 8px;
 }
 
-#msg {
-  margin: 5px;
-  width: 100%;
+.inputGroup {
+  text-align: center;
+  margin-bottom: 5px;
+  #msg {
+    margin: 5px;
+    width: 90%;
+  }
 }
 
 .buttonGroup {
-  margin-top: 5px;
+  margin-bottom: 5px;
+  text-align: center;
 }
 
 #payload {
@@ -71,6 +78,7 @@ body {
 .log {
   display: none;
 }
+
 // Social Images
 .social {
   text-align: center;
